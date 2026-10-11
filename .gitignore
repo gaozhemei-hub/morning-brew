@@ -1,0 +1,10 @@
+# 凭据与本地状态
+.env
+state/
+out/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
