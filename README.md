@@ -1,6 +1,6 @@
 # 五道口 AI 早咖啡 · Morning Brew
 
-![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) ![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg) ![Skills](https://img.shields.io/badge/Skills-3-blueviolet.svg) ![Sources](https://img.shields.io/badge/Sources-39-informational.svg) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) ![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg) ![Skills](https://img.shields.io/badge/Skills-3-blueviolet.svg) ![Sources](https://img.shields.io/badge/Sources-39%20daily%20%2B%2034%20rotating-informational.svg) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
 > 每天早上，用一杯咖啡的时间，把隔夜与昨天的 AI 及相邻行业信息**按三层专业人设筛一遍**，
 > 写成一份进 Obsidian、也能发邮件的晨报——并且**自动维护一张会自己长大的知识网**。
@@ -152,6 +152,26 @@ python3 scripts/install_schedule.py --at 08:40             # 只打印安装方�
 三种解法：① 插电 + 外接显示器（clamshell）；② `sudo pmset -a disablesleep 1`（合盖不睡，注意散热）；
 ③ 把时间设在你一定会开机的时段（例如起床后 08:40）。
 
+## 四·六、信源构成（口径以 `sources/sources.json` 为准）
+
+`sources` 数组共 **77 条记录 = 39 常驻 + 34 轮换 + 4 不可用**（恒等可自查）：
+
+| 类别 | 数量 | 明细 |
+| --- | --- | --- |
+| **常驻源**（每天都抓） | **39** | 海外 VC／科技媒体（Sequoia、a16z、Techmeme…）+ 中文媒体 + 论文与产品榜（HF Daily Papers、Product Hunt）+ GitHub Trending + 已接入的 3 个公众号（硅星人Pro、42章经、饭统戴老板），每条带 `verified` 实测结论 |
+| **轮换公众号**（按星期轮值） | **34** | **AI前沿 9**（周一/周五）｜**商业创投 12**（周二/周六）｜**产品工程 11**（周三）｜**半导体 2**（周四）｜周日全扫。轮换表以 `scripts/daily.py` 的 `ROTATION` 为唯一准绳 |
+| **不可用**（已记录，不抓） | **4** | Benchmark（无内容源）｜峰瑞资本（无可用源）｜微信公众号源：东四十条资本 / 融了么（不在公开实例中）｜LlamaIndex 文档（改由「开源与工程层」子 skill 每周检查） |
+| **公众号候选池** | **375** | 来自 [BestBlogs](https://github.com/ginobefun/BestBlogs) 公开维护的 wechat2rss 实例（见 `sources/wechat-bestblogs-375.opml`）。**候选池 ≠ 已采用**：目前从中接入 **37 个**（3 常驻 + 34 轮换），其余仍是候选，验证后才进正式源 |
+| **中文热榜**（第四块） | **8** | 财联社电报、华尔街见闻、雪球热股、Hacker News、V2EX、少数派、微博热搜、知乎热榜（见 `scripts/hotlist.py`；无需 API key） |
+
+
+> **已知中文源缺口（9 个）**：量子位、投中网、深响、瑞泽洞察、融了么、东四十条资本、GGV纪源资本、AI闹、葬AI
+> ——均不在 BestBlogs 公开实例的 375 源中，需自建 wechat2rss 实例才能补上（另有峰瑞资本在候选池中但源不可用）。
+> **这一行是刻意写出来的**：缺口被点名，才有可能被补上。
+
+> **为什么强调口径**：信源数量是这类项目最容易含糊的地方。上表的每个数字都能用
+> `python3 -c "import json;d=json.load(open('sources/sources.json'));print(len(d['sources']))"` 与 `scripts/daily.py --help` 自行复核。
+
 ## 五、项目结构
 
 ```
@@ -182,7 +202,7 @@ examples/                    产出示例（含"手写基准版"）
 | **v0** 通用资讯雷达 | "帮我每天看前沿" | 21 个源、一句话判断式条目 |
 | **v1** 用户判定不合格 | 用户指出"太宽泛、没有层次" | 用户给出一份完整指引 → 确定**三层结构 + 每层人设 + 指定信源** |
 | **v2** 双链与人物库 | 用户反馈"看不到跳转""大佬不认识" | 知识库标题规范化做锚点；正文双链加 `↗`；人物卡加**一键关注** |
-| **v3** 信源翻倍 | 用户提示"GitHub 上肯定有人做过" | 抄现成：公众号 375 源打通（推翻"只能自建"的旧结论）、新增热榜第四块、A 组按星期轮换 |
+| **v3** 信源扩容（可用源 21 → 73） | 用户提示"GitHub 上肯定有人做过" | 抄现成：接入 375 候选池中的 37 个公众号源（推翻"只能自建"的旧结论）、新增热榜第四块、轮换组按星期轮值。**按今天的口径：常驻 39 + 轮换 34 = 73 个可用源** |
 | **v4** 工程加固 | 定时任务实测暴露问题 | 修复去重键丢查询参数、轮换判断顺序、`.env` 优先级、邮件引用块渲染 |
 
 **两份过程材料值得单独看**：

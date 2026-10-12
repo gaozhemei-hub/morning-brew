@@ -5,7 +5,7 @@
 对应"社会共识"这条线：热搜反映的是共识的**温度**，不是事实本身——所以只给榜单前几条，不做解读。
 
 用法：
-    python3 hotlist.py                 # 默认 6 个源，每源前 5 条
+    python3 hotlist.py                 # 默认 8 个源，每源前 5 条
     python3 hotlist.py --per 3
     python3 hotlist.py --ids weibo,zhihu,cls-telegraph
     python3 hotlist.py --all           # 打印所有可用源
