@@ -133,6 +133,23 @@ MORNING_BREW_SMTP_PASS=                   # QQ 授权码 / Gmail 应用专用密
 # MORNING_BREW_PROXY=http://127.0.0.1:7890   # 需要访问海外源时
 ```
 
+## 四·五、定时运行（**时间可自定义**）
+
+**默认每天 07:30**。改时间只要一条命令（会自动写好定时任务，幂等）：
+
+```bash
+python3 scripts/install_schedule.py --at 08:40 --install   # 写入系统 crontab
+python3 scripts/install_schedule.py --show                 # 看当前设的时间
+python3 scripts/install_schedule.py --at 08:40             # 只打印安装方式（不写系统）
+```
+
+- **系统 crontab**：任何 macOS/Linux 都能用（推荐）
+- **Agent 定时任务**（如 Hermes）：新建一个每日任务，让它跑 `python3 scripts/daily.py`，时间设为你要的即可（提示词参考 `skills/morning-brew/SKILL.md`）
+
+⚠️ **一个必须知道的坑：macOS 合盖会睡眠，任务不会按时跑。**
+三种解法：① 插电 + 外接显示器（clamshell）；② `sudo pmset -a disablesleep 1`（合盖不睡，注意散热）；
+③ 把时间设在你一定会开机的时段（例如起床后 08:40）。
+
 ## 五、项目结构
 
 ```
