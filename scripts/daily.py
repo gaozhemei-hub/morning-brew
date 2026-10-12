@@ -64,13 +64,22 @@ def main() -> int:
     print(f"[2/3] 简报  rc={rc2} → {brief_path.name}（{len(brief)} 字节）")
 
     # 数据新鲜度：防止拿旧 JSON 当今天的产出
+    # 数据新鲜度：generated_at 是 **UTC**，必须换算到本地时区再比日期
+    # （否则每天早上 07:30 = UTC 前一天 23:30，会天天误报"不是今天"）
     fresh = "未知"
     jf = OUT / f"{today.isoformat()}.json"
     if jf.exists():
         try:
+            from datetime import timezone as _tz
             payload = json.loads(jf.read_text(encoding="utf-8"))
             gen = payload.get("generated_at", "")
-            fresh = f"{gen[:19]}（{'今天' if gen[:10] == today.isoformat() else '⚠️ 不是今天'}）"
+            dt_utc = datetime.fromisoformat(gen.replace("Z", "+00:00"))
+            if dt_utc.tzinfo is None:
+                dt_utc = dt_utc.replace(tzinfo=_tz.utc)
+            dt_local = dt_utc.astimezone()
+            same_day = dt_local.date() == today
+            fresh = (f"{dt_local.strftime('%Y-%m-%d %H:%M')} 本地"
+                     f"（{'✅ 今天' if same_day else '⚠️ 不是今天（UTC ' + dt_utc.strftime('%m-%d %H:%M') + '）'}）")
         except Exception as e:  # noqa: BLE001
             fresh = f"读取失败 {type(e).__name__}"
     print(f"      数据新鲜度：{fresh}")
