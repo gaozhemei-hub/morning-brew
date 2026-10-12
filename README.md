@@ -1,5 +1,7 @@
 # 五道口 AI 早咖啡 · Morning Brew
 
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) ![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg) ![Skills](https://img.shields.io/badge/Skills-3-blueviolet.svg) ![Sources](https://img.shields.io/badge/Sources-39-informational.svg) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+
 > 每天早上，用一杯咖啡的时间，把隔夜与昨天的 AI 及相邻行业信息**按三层专业人设筛一遍**，
 > 写成一份进 Obsidian、也能发邮件的晨报——并且**自动维护一张会自己长大的知识网**。
 >
