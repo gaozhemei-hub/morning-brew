@@ -7,6 +7,7 @@
     python3 send_digest.py --md <早咖啡.md> --date 2026-10-12            # 按 .env 配置发送
     python3 send_digest.py --md <早咖啡.md> --dry-run                    # 只渲染不发信（自检）
     python3 send_digest.py --md <早咖啡.md> --provider none              # 显式跳过发送
+    python3 send_digest.py --md <早咖啡.md> --voice out/voice-<日期>.json  # 附上语音晨报（失败也会在邮件里说明）
 
 配置（环境变量或 ~/.hermes/.env）：
     MORNING_BREW_EMAIL_PROVIDER   qq | gmail | smtp | none
@@ -18,6 +19,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import smtplib
@@ -143,6 +145,34 @@ def inline(text: str) -> str:
     return text
 
 
+MAX_ATTACH_MB = 20   # 多数邮箱单附件上限 20–50MB，取保守值
+
+
+def voice_section(voice_json: str) -> tuple[str, Path | None]:
+    """读 voice_brief.py 的状态文件 → 邮件顶部的「语音版」小节 + 要附的 mp3。
+    **禁止静默失败**：没有音频时也要写明原因，而不是悄悄少一个附件。"""
+    p = Path(voice_json).expanduser()
+    if not p.exists():
+        return f"> 🎧 今日语音版：未生成（找不到状态文件 {p.name}）\n\n", None
+    try:
+        st = json.loads(p.read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        return f"> 🎧 今日语音版：状态文件无法读取（{type(e).__name__}）\n\n", None
+    mp3 = Path(st.get("mp3") or "")
+    if st.get("status") not in ("ok", "partial") or not mp3.is_file():
+        return f"> 🎧 今日语音版：生成失败——{st.get('reason') or '原因未知'}。文字版不受影响。\n\n", None
+    size_mb = mp3.stat().st_size / 1e6
+    lines = [f"> 🎧 **今日语音版**（附件 {mp3.name}，{st.get('checks', {}).get('实际时长', '')}）"]
+    if st.get("status") == "partial":
+        lines.append(f"> ⚠️ {st.get('reason')}")
+    lines.append(">")
+    lines += [f"> {c['start']}　{c['title']}" for c in st.get("chapters", [])]
+    if size_mb > MAX_ATTACH_MB:
+        lines.append(f"> ⚠️ 音频 {size_mb:.0f}MB 超过附件上限，未附上；文件在本机 {mp3}")
+        return "\n".join(lines) + "\n\n", None
+    return "\n".join(lines) + "\n\n", mp3
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--md", required=True, help="早咖啡 markdown 文件")
@@ -151,6 +181,7 @@ def main() -> int:
     ap.add_argument("--to", default="", help="覆盖收件人")
     ap.add_argument("--provider", default="", help="覆盖 provider：qq/gmail/smtp/none")
     ap.add_argument("--dry-run", action="store_true", help="只渲染不发信")
+    ap.add_argument("--voice", default="", help="voice_brief.py 产出的 out/voice-<日期>.json")
     args = ap.parse_args()
 
     load_env()
@@ -159,6 +190,10 @@ def main() -> int:
         print(f"✗ 找不到文件：{md_path}", file=sys.stderr)
         return 2
     md = md_path.read_text(encoding="utf-8")
+    attach = None
+    if args.voice:
+        head, attach = voice_section(args.voice)
+        md = head + md
 
     provider = (args.provider or os.environ.get("MORNING_BREW_EMAIL_PROVIDER", "none")).lower()
     to = args.to or os.environ.get("MORNING_BREW_EMAIL_TO", "")
@@ -171,6 +206,8 @@ def main() -> int:
         out.write_text(html, encoding="utf-8")
         print(f"[dry-run] provider={provider or 'none'}｜收件人={to or '(未设，将只输出本地文件)'}｜未配凭据也能跑通")
         print(f"[dry-run] HTML 预览已写入 {out}（{len(html)} 字节）")
+        if args.voice:
+            print(f"[dry-run] 语音附件：{attach or '无（原因已写进邮件顶部）'}")
         return 0
 
     preset = PRESETS.get(provider, {})
@@ -190,12 +227,14 @@ def main() -> int:
     msg["To"] = to
     msg.set_content("本邮件为 HTML 格式，请用支持 HTML 的客户端查看。")
     msg.add_alternative(html, subtype="html")
+    if attach:
+        msg.add_attachment(attach.read_bytes(), maintype="audio", subtype="mpeg", filename=attach.name)
 
     ctx = ssl.create_default_context()
     with smtplib.SMTP_SSL(host, port, context=ctx, timeout=45) as s:
         s.login(user, pwd)
         s.send_message(msg)
-    print(f"✓ 已发送：{subject} → {to}（provider={provider}）")
+    print(f"✓ 已发送：{subject} → {to}（provider={provider}）" + (f"｜附语音 {attach.name}" if attach else ""))
     return 0
 
 

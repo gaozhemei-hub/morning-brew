@@ -87,6 +87,13 @@
 **先是信息密度，再是精炼**。过早压缩会丢掉推理链和例子；等格式稳定、偏好明确后再收紧。
 （这条也写在规范里，作为对贡献者的期待管理）
 
+### 9. 为什么语音版不是"把晨报念出来"
+晨报是写给眼睛的：双链、链接、`↗`、分点符号会被念出来或造成怪停顿；**耳朵不能回看**，长段分点听三条就忘。
+所以语音版做的是**把阅读稿改写成收听稿**：结论先行、口头路标（"第一条""进入技术层"）、术语第一次出现时半句解释；
+再按通勤时长做取舍——`[必须知道]` 完整播、`[值得知道]` 只播一句、热榜不播。
+两道防线保证"宁缺勿错"：**改写稿出现原文没有的数字，该段回退规则稿**；**读法规范化**（18%→34%、245MW、GPT-5、a16z）
+先走规则、再查词典，抽检听到读错就补进 `sources/pronunciation.json`——**词典条数和每期错读数，就是这个功能的质量曲线**。
+
 ---
 
 ## 三、竞品分析（站在巨人肩膀上）
@@ -173,6 +180,19 @@ python3 scripts/install_schedule.py --at 08:40             # 只打印安装方�
 > **为什么强调口径**：信源数量是这类项目最容易含糊的地方。上表的每个数字都能用
 > `python3 -c "import json;d=json.load(open('sources/sources.json'));print(len(d['sources']))"` 与 `scripts/daily.py --help` 自行复核。
 
+## 四·七、语音晨报（通勤收听版，可选）
+
+```bash
+python3 scripts/voice_brief.py --list-voices                                   # 先挑音色
+python3 scripts/voice_brief.py --md <早咖啡.md> --date 2026-10-12 --dry-run   # 不调接口，先看收听稿长什么样
+python3 scripts/voice_brief.py --md <早咖啡.md> --date 2026-10-12             # 生成 out/voice-<日期>.mp3 + 章节目录
+python3 scripts/send_digest.py --md <早咖啡.md> --voice out/voice-2026-10-12.json   # 邮件附上音频
+```
+
+- 用的是**阶跃星辰**的 TTS（默认 `stepaudio-2.5-tts`，可用一句话指定"晨间新闻播报"的语气）与对话模型改写；配置见 `.env.example`
+- 产出三个文件：`.mp3`（音频）、`.md`（章节目录 + 收听稿 + 质检记录）、`.json`（状态，邮件读取它决定附件与说明）
+- 不配 Key 也不会报错中断：文字版照发，邮件顶部写明"语音未生成"及原因
+
 ## 五、项目结构
 
 ```
@@ -184,14 +204,17 @@ scripts/
   fetch.py                   多类型抓取（rss / json_api / html / sitemap / hf_daily / twitter）+ 轮换
   digest_brief.py            抓取结果 → 人/模型可读简报 + 信源健康
   hotlist.py                 第四块·中文热议（8 个榜，无需 API key）
-  send_digest.py             markdown → HTML 邮件，provider 可切换
+  voice_brief.py             晨报 → 收听稿 → 读法规范化 → 阶跃 TTS（mp3 + 章节时间戳）
+  send_digest.py             markdown → HTML 邮件，provider 可切换（可附语音版）
   setup_email.py             交互式配邮箱（授权码隐藏输入，不落聊天记录）
+  setup_tts.py               交互式配 StepFun API Key（同上；支持从剪贴板读、--doctor 体检）
   linkedin_match.py          人名 → 领英主页（置信度打分）
   repo_probe.py              仓库 star / README 结构 / 架构图线索
 sources/
   sources.json               信源清单（每条带 verified 实测结论与日期）
   wechat-bestblogs-375.opml  375 个微信公众号源（来自 BestBlogs，致谢）
   候补信源.md                 候选池 → 验证 → 升级的中间层（37 个候选，36 个已升级）
+  pronunciation.json         语音版读法词典（抽检读错就补一条）
 templates/                   深挖档案 / 价值链地图模板
 docs/                        规范、迭代记录、踩坑清单
 examples/                    产出示例（含"手写基准版"）
@@ -206,6 +229,7 @@ examples/                    产出示例（含"手写基准版"）
 | **v2** 双链与人物库 | 用户反馈"看不到跳转""大佬不认识" | 知识库标题规范化做锚点；正文双链加 `↗`；人物卡加**一键关注** |
 | **v3** 信源扩容（可用源 21 → 73） | 用户提示"GitHub 上肯定有人做过" | 抄现成：接入 375 候选池中的 37 个公众号源（推翻"只能自建"的旧结论）、新增热榜第四块、轮换组按星期轮值。**按今天的口径：常驻 39 + 轮换 34 = 73 个可用源** |
 | **v4** 工程加固 | 定时任务实测暴露问题 | 修复去重键丢查询参数、轮换判断顺序、`.env` 优先级、邮件引用块渲染 |
+| **v5** 语音晨报 | 场景拓展：通勤时看不了屏幕，但耳朵空着 | 阅读稿→收听稿改写、数字一致性校验、读法规范化词典、阶跃 TTS、邮件附音频与章节目录 |
 
 **两份过程材料值得单独看**：
 - [`docs/规范-五道口AI早咖啡.md`](docs/规范-五道口AI早咖啡.md) —— **用户在 v1 手写的完整设计指引**，是本项目的"需求文档"
