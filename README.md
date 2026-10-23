@@ -266,7 +266,7 @@ examples/                    产出示例（含"手写基准版"）
 [Horizon](https://github.com/Thysrael/Horizon)、[ai-daily-pulse](https://github.com/FavorPan/ai-daily-pulse)、
 [ai-news-brief](https://github.com/frankzch/ai-news-brief)、[news-summary](https://github.com/guo-yichen/news-summary)、
 [Awesome-AISourceHub](https://github.com/AmbroseX/Awesome-AISourceHub)、[RSSHub](https://github.com/DIYgod/RSSHub)、
-[newsnow](https://github.com/ourongxing/newsnow) 等先行项目——**没有它们，这个项目不会在两周内成形。**
+[newsnow](https://github.com/ourongxing/newsnow) 等先行项目——**本项目在本地长期自用迭代，开源版本的信源、架构与去重方案大量借鉴了它们。**
 
 ## License
 
