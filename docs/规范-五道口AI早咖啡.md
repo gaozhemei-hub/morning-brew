@@ -84,7 +84,7 @@
 **★ 这一层单独做成一个子 skill**：
 - 日常晨报里只给"一句话 + 链接"；
 - 用户看完晨报后**有技术问题可单独调用这个 skill**深入；
-- 典型用法：**遇到一个新赛道（例如 AI 视频）→ 先去 GitHub 搜 star 最多的开源项目 → 读它的 `README.md` 和**架构图**（Architecture Diagram）。
+- 典型用法：遇到一个新赛道（例如 AI 视频）→ 先去 GitHub 搜 star 最多的开源项目 → 阅读项目的 `README.md` 和架构图（Architecture Diagram）。
 
 ---
 

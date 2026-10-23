@@ -2,7 +2,7 @@
 name: person-follow-links
 description: "Give each person a one-click LinkedIn/X follow link."
 version: 0.1.0
-author: Irene, Hermes Agent
+author: Zmei_IR, Hermes Agent
 license: MIT
 platforms: [linux, macos]
 metadata:

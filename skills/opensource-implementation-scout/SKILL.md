@@ -2,7 +2,7 @@
 name: opensource-implementation-scout
 description: "Trace how an idea becomes code: repos, README, architecture."
 version: 0.1.0
-author: Irene, Hermes Agent
+author: Zmei_IR, Hermes Agent
 license: MIT
 platforms: [linux, macos]
 metadata:

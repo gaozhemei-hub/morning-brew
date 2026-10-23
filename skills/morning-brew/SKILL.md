@@ -2,7 +2,7 @@
 name: morning-brew
 description: "Produce a 3-layer daily AI briefing with a linked vault."
 version: 1.0.0
-author: Irene, Hermes Agent
+author: Zmei_IR, Hermes Agent
 license: MIT
 platforms: [linux, macos]
 metadata:

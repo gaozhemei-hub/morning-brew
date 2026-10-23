@@ -110,7 +110,7 @@
 | **[Horizon](https://github.com/Thysrael/Horizon)**（9.6k★） | 每日 AI 资讯自动摘要 | 单 JSON 管全部信源；Fetch→去重→打分→筛选→投递的流水线骨架 | 我们加了**人设分层**与**知识库双链**（它输出纯 markdown） |
 | **[ai-news-brief](https://github.com/frankzch/ai-news-brief)** | 94 源 + 双语摘要 | 两阶段去重（指纹粗筛 → 语义精筛）、分层反爬 | 我们暂未上向量去重（信源规模还不够大） |
 | **[ai-daily-pulse](https://github.com/FavorPan/ai-daily-pulse)** | RSS → 打分 → Obsidian 日报 | 反幻觉思路（事实 token 对齐）；RSS 正文过短时回退抓全文 | **它的输出是 Obsidian 日报，但用普通 markdown；双链与人物库是我们独有的** |
-| **[news-summary](https://github.com/guo-yichen/news-summary)** | RSS → Notion/邮件 | ⭐**"no updates today" 显式列出**——信源沉默失败可观测，我们从它学的最有用一条 | 我们扩成三类健康状态 |
+| **[news-summary](https://github.com/guo-yichen/news-summary)** | RSS → Notion/邮件 | ⭐ **"no updates today" 显式列出** —— 信源沉默失败可观测，我们从它学的最有用一条 | 我们扩成三类健康状态 |
 | **[Awesome-AISourceHub](https://github.com/AmbroseX/Awesome-AISourceHub)** | 分平台信息源清单 | 源清单与质量标注（已存档到本仓库） | 我们只把它当**候选池**，验证后才进正式源 |
 | **[RSSHub](https://github.com/DIYgod/RSSHub)**（46k★） | 万物皆可 RSS | 无 RSS 站点的通用兜底（36氪即走此路） | 我们把它当工具，不重复造 |
 | Folo / FreshRSS / n8n | 阅读器与自动化 | 结论：**这两层直接用现成的**，不必自建 | 我们只做上层（分层、沉淀、投递） |
